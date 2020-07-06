@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import keras as k
 import numpy as np
 import operator
-import math
 
-path = r'images\\test1.jpg'
+path = r'images\\test8.jpg'
 img = cv2.imread(path)
+img = cv2.resize(img,(700,700))
 cv2.imshow('original', img)
 cv2.waitKey(0)
 
@@ -14,11 +14,11 @@ def preprocess_img(img):
     #grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #Gaussian Blur Filter
-    dst = cv2.GaussianBlur(gray,(5,5),0)
+    dst = cv2.GaussianBlur(gray,(3,3),3)
     #Transform to inverse binary image
-    img = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 3)
+    img = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 4)
     #Dilate the boundaries
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
     img = cv2.dilate(img,kernel,iterations = 1)
 
     cv2.imshow('dilate', img)
@@ -43,7 +43,7 @@ def find_corners(img):
 def distance_between(p1,p2):
     x1, x2 = p1[0], p1[1]
     y1, y2 = p2[0], p2[1]
-    dist = math.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
+    dist = np.sqrt( (x2 - x1)**2 + (y2 - y1)**2 )
     return dist
 
 corners = find_corners(img)
@@ -74,5 +74,8 @@ def cut_and_warp(img, corners):
     return warp
 
 warp = cut_and_warp(img, corners)
+dst = cv2.GaussianBlur(warp,(3,3),3)
+cv2.imshow('final', dst)
+cv2.waitKey(0)
 
 
