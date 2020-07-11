@@ -4,7 +4,7 @@ import keras as k
 import numpy as np
 import operator
 
-path = r'images\\test8.jpg'
+path = r'images\\test1.jpg'
 img = cv2.imread(path)
 img = cv2.resize(img,(700,700))
 cv2.imshow('original', img)
@@ -16,7 +16,7 @@ def preprocess_img(img):
     #Gaussian Blur Filter
     dst = cv2.GaussianBlur(gray,(3,3),3)
     #Transform to inverse binary image
-    img = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 4)
+    img = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 3)
     #Dilate the boundaries
     kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
     img = cv2.dilate(img,kernel,iterations = 1)
@@ -74,8 +74,34 @@ def cut_and_warp(img, corners):
     return warp
 
 warp = cut_and_warp(img, corners)
-dst = cv2.GaussianBlur(warp,(3,3),3)
-cv2.imshow('final', dst)
+warp = cv2.GaussianBlur(warp,(3,3),3)
+cv2.imshow('final', warp)
 cv2.waitKey(0)
 
-
+frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
+lines = cv2.HoughLines(img, 1, np.pi /180, 300,0,0)
+if (lines is not None):
+    lines=lines[0]
+    lines = sorted(lines, key=lambda line:line[0])
+    pos_h = 0
+    pos_v = 0
+    for rho, theta in lines:
+        a = np.cos(theta)
+        b = np.sin(theta)
+        x0 = a*rho
+        y0 = b*rho
+        x1 = int(x0 + 1000*(-b))
+        y1 = int(y0 + 1000*(a))
+        x2 = int(x0 - 1000*(-b))
+        y2 = int(y0 - 1000*(a))
+        if (b>0.5):
+            if(rho-pos_h>10):
+                pos_h = rho
+                cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)
+            else:
+                if(rho-pos_v>10):
+                    pos_v = rho
+                    cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)
+        
+cv2.imshow('lines', frame)
+cv2.waitKey(0)
