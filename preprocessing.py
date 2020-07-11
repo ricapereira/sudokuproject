@@ -5,9 +5,11 @@ import numpy as np
 import operator
 
 path = r'images\\test1.jpg'
-img = cv2.imread(path)
-img = cv2.resize(img,(700,700))
-cv2.imshow('original', img)
+img0 = cv2.imread(path)
+print(img0.shape[0])
+if (img0.shape[0]<600) or (img0.shape[1]<600):
+    img0 = cv2.resize(img0,(600,600))
+cv2.imshow('original', img0)
 cv2.waitKey(0)
 
 def preprocess_img(img):
@@ -25,7 +27,7 @@ def preprocess_img(img):
     cv2.waitKey(0)
     return img
 
-img = preprocess_img(img)
+img = preprocess_img(img0)
 
 def find_corners(img):
     _, contours, h = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -78,30 +80,16 @@ warp = cv2.GaussianBlur(warp,(3,3),3)
 cv2.imshow('final', warp)
 cv2.waitKey(0)
 
-frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
-lines = cv2.HoughLines(img, 1, np.pi /180, 300,0,0)
-if (lines is not None):
-    lines=lines[0]
-    lines = sorted(lines, key=lambda line:line[0])
-    pos_h = 0
-    pos_v = 0
-    for rho, theta in lines:
-        a = np.cos(theta)
-        b = np.sin(theta)
-        x0 = a*rho
-        y0 = b*rho
-        x1 = int(x0 + 1000*(-b))
-        y1 = int(y0 + 1000*(a))
-        x2 = int(x0 - 1000*(-b))
-        y2 = int(y0 - 1000*(a))
-        if (b>0.5):
-            if(rho-pos_h>10):
-                pos_h = rho
-                cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)
-            else:
-                if(rho-pos_v>10):
-                    pos_v = rho
-                    cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2)
-        
-cv2.imshow('lines', frame)
+def houghtransf(warp):
+    lines = cv2.HoughLinesP(warp,2,np.pi/2,500,minLineLength=200,maxLineGap=10)
+    frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
+    for l in lines:
+        x1,y1,x2,y2 = l[0]
+        cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2, cv2.LINE_AA)
+    return frame
+    
+
+lines = houghtransf(warp)
+cv2.imshow('lines', lines)
 cv2.waitKey(0)
+        
