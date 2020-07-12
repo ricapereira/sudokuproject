@@ -11,6 +11,8 @@ import pydot
 from IPython.display import SVG
 from keras.utils.vis_utils import model_to_dot
 from keras.utils import plot_model
+from keras.callbacks import EarlyStopping
+import h5py
 
 def remove_digit0(train_X,train_Y):
     id = []
@@ -115,11 +117,18 @@ train_X, train_Y, test_X, test_Y = get_data(train_X, train_Y, test_X, test_Y)
 train_X, train_Y = shuffle_data(train_X, train_Y)
 
 digitModel = DigitModel(train_X.shape[1:])
-digitModel.compile(optimizer = "Adam", loss = "binary_crossentropy", metrics = ["accuracy"])
-digitModel.fit(x = train_X, y = train_Y, epochs = 38, batch_size = 16)
+digitModel.compile(optimizer = "Adam", loss = "categorical_crossentropy", metrics = ["accuracy"])
 
-preds = digitModel.predict(test_X)
-predictions = preds.argmax(axis=-1)
+EarlyStop_callback = k.callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+my_callback=[EarlyStop_callback]
+
+digitModel.fit(x = train_X, y = train_Y, epochs = 34, batch_size = 16, validation_split = 0.1, callbacks = my_callback)
+
+_, acc = digitModel.evaluate(test_X, test_Y, verbose=0)
+
+print('Test Accuracy: ', acc)
+
+Model.save("final_model.h5")
 
 
 
