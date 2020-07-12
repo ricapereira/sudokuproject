@@ -2,17 +2,6 @@ import cv2
 import keras as k
 import numpy as np
 import operator
-<<<<<<< HEAD
-
-path = r'images\\test1.jpg'
-img0 = cv2.imread(path)
-if (img0.shape[0]<600) or (img0.shape[1]<600):
-    img0 = cv2.resize(img0,(600,600))
-cv2.imshow('original', img0)
-cv2.waitKey(0)
-=======
-import imutils
->>>>>>> alternativeGrid
 
 def preprocess_img(img):
     #grayscale
@@ -22,7 +11,7 @@ def preprocess_img(img):
     #Transform to inverse binary image
     img = cv2.adaptiveThreshold(dsst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 5)
     #Dilate the boundaries
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
     img = cv2.dilate(img,kernel,iterations = 1)
 
     return img
@@ -146,21 +135,6 @@ warp = cv2.GaussianBlur(warp,(3,3),3)
 squares, frame = make_grid(warp)
 digits = extract_digits(frame, squares)
 
-<<<<<<< HEAD
-def houghtransf(warp):
-    edges = cv2.Canny(warp,90,150,apertureSize = 3)
-    lines = cv2.HoughLinesP(warp,1,np.pi/180,128,minLineLength=450,maxLineGap=100)
-    frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
-    for l in lines:
-        x1,y1,x2,y2 = l[0]
-        cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2, cv2.LINE_AA)
-    return frame
- 
-
-lines = houghtransf(warp)
-cv2.imshow('lines', lines)
-cv2.waitKey(0)
-=======
     
 
 
@@ -170,4 +144,3 @@ cv2.waitKey(0)
 
 
 
->>>>>>> alternativeGrid
