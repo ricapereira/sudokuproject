@@ -21,25 +21,30 @@ def remove_digit0(train_X,train_Y):
 
 train_X, train_Y = remove_digit0(train_X, train_Y)
 test_X, test_Y = remove_digit0(test_X, test_Y)
-print(train_Y.shape)
-print(train_X.shape)
-print(test_Y.shape)
-print(test_X.shape)
+print('train_y',train_Y.shape)
+print('train_x',train_X.shape)
+print('test_y',test_Y.shape)
+print('test_x',test_X.shape)
 
 train_path = r'Train'  
 list_folder = os.listdir(train_path)
-
+trset = []
 for folder in list_folder:
     fimages = os.listdir(os.path.join(train_path, folder))
     for f in fimages:
         img = cv2.imread(os.path.join(train_path, folder, f))
         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         img = cv2.resize(img, (28,28))
-        trset = np.concatenate((img), axis=0)
-    print(trset.shape)
+        trset.append(img)
+trset = np.array(trset, dtype = np.uint8)
+trset = trset.reshape(5000, -1)
+print('trset',trset.shape)
+
 train_label = []
 for i in range(0,10):
     temp = 500*[i]
     train_label += temp
+trlabel = np.array(train_label, dtype = np.uint8)
+print('trlabel',trlabel.shape)
 
       
