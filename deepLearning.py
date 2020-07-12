@@ -47,4 +47,6 @@ for i in range(0,10):
 trlabel = np.array(train_label, dtype = np.uint8)
 print('trlabel',trlabel.shape)
 
+
+
       
