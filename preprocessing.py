@@ -4,7 +4,7 @@ import keras as k
 import numpy as np
 import operator
 
-path = r'images\\test3.jpg'
+path = r'images\\test1.jpg'
 img0 = cv2.imread(path)
 if (img0.shape[0]<600) or (img0.shape[1]<600):
     img0 = cv2.resize(img0,(600,600))
@@ -80,9 +80,9 @@ cv2.imshow('final', warp)
 cv2.waitKey(0)
 
 def houghtransf(warp):
-    lines = cv2.HoughLinesP(warp,2,np.pi/2,500,minLineLength=450,maxLineGap=10)
+    edges = cv2.Canny(warp,90,150,apertureSize = 3)
+    lines = cv2.HoughLinesP(warp,1,np.pi/180,128,minLineLength=450,maxLineGap=100)
     frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
-    print(lines.shape)
     for l in lines:
         x1,y1,x2,y2 = l[0]
         cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2, cv2.LINE_AA)
