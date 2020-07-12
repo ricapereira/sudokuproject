@@ -1,4 +1,5 @@
 import numpy as np
+'''
 game = np.array([0,0,4,3,0,0,2,0,9,
                  0,0,5,0,0,9,0,0,1,
                  0,7,0,0,6,0,0,4,3,
@@ -9,7 +10,7 @@ game = np.array([0,0,4,3,0,0,2,0,9,
                  0,0,3,5,0,8,6,9,0,
                  0,4,2,9,1,0,3,0,0])
 game = game.reshape((9,9))
-
+'''
 def find_blank(game,n):
     for row in range (9):
         for col in range (9):
@@ -63,7 +64,7 @@ def solve(game):
             game[row][col] = 0
     return False
 
-if (solve(game)):
-    print(game)
-else:
-    print("This game has no solution!")
+    if (solve(game)):
+        print(game)
+    else:
+        print("This game has no solution!")

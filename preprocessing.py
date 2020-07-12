@@ -89,13 +89,13 @@ def center_pad(num):
     num = np.pad(num, ((top,bottom), (left, right)), 'constant')
     return num
 
-def cut_square(frame, square):
+def cut_square(frame, square, warp):
     return warp[int(square[0][1]):int(square[1][1]),int(square[0][0]):int(square[1][0])]
 
-def extract_digits(frame, squares):
+def extract_digits(frame, squares, warp):
     num = []
     for i in range(81):
-        num.append(cut_square(frame, squares[i]))
+        num.append(cut_square(frame, squares[i], warp))
         num[i] = cv2.resize(num[i], (28,28))
         kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(1,1))
         num[i] = cv2.morphologyEx(num[i], cv2.MORPH_DILATE, kernel, iterations=1)
@@ -121,19 +121,20 @@ def extract_digits(frame, squares):
     num = np.array(num, dtype = np.uint8)
     return num
 
+def img_to_digits(path):
+    img0 = cv2.imread(path)
+    if (img0.shape[0]<600) or (img0.shape[1]<600):
+        img0 = cv2.resize(img0,(600,600))
+    cv2.imshow('original', img0)
+    cv2.waitKey(0)
+    img = preprocess_img(img0)
+    corners = find_corners(img)
+    warp = cut_and_warp(img, corners)
+    warp = cv2.GaussianBlur(warp,(3,3),3)
+    squares, frame = make_grid(warp)
+    digits = extract_digits(frame, squares, warp)
 
-path = r'images\\test1.jpg'
-img0 = cv2.imread(path)
-if (img0.shape[0]<600) or (img0.shape[1]<600):
-    img0 = cv2.resize(img0,(600,600))
-cv2.imshow('original', img0)
-cv2.waitKey(0)
-img = preprocess_img(img0)
-corners = find_corners(img)
-warp = cut_and_warp(img, corners)
-warp = cv2.GaussianBlur(warp,(3,3),3)
-squares, frame = make_grid(warp)
-digits = extract_digits(frame, squares)
+    return digits
 
     
 
