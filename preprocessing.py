@@ -4,9 +4,8 @@ import keras as k
 import numpy as np
 import operator
 
-path = r'images\\test1.jpg'
+path = r'images\\test3.jpg'
 img0 = cv2.imread(path)
-print(img0.shape[0])
 if (img0.shape[0]<600) or (img0.shape[1]<600):
     img0 = cv2.resize(img0,(600,600))
 cv2.imshow('original', img0)
@@ -20,7 +19,7 @@ def preprocess_img(img):
     #Transform to inverse binary image
     img = cv2.adaptiveThreshold(dst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 3)
     #Dilate the boundaries
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
     img = cv2.dilate(img,kernel,iterations = 1)
 
     cv2.imshow('dilate', img)
@@ -81,15 +80,15 @@ cv2.imshow('final', warp)
 cv2.waitKey(0)
 
 def houghtransf(warp):
-    lines = cv2.HoughLinesP(warp,2,np.pi/2,500,minLineLength=200,maxLineGap=10)
+    lines = cv2.HoughLinesP(warp,2,np.pi/2,500,minLineLength=450,maxLineGap=10)
     frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
+    print(lines.shape)
     for l in lines:
         x1,y1,x2,y2 = l[0]
         cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2, cv2.LINE_AA)
     return frame
-    
+ 
 
 lines = houghtransf(warp)
 cv2.imshow('lines', lines)
 cv2.waitKey(0)
-
