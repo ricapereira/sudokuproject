@@ -80,16 +80,19 @@ warp = cv2.GaussianBlur(warp,(3,3),3)
 cv2.imshow('final', warp)
 cv2.waitKey(0)
 
-def houghtransf(warp):
-    lines = cv2.HoughLinesP(warp,2,np.pi/2,500,minLineLength=200,maxLineGap=10)
-    frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
-    for l in lines:
-        x1,y1,x2,y2 = l[0]
-        cv2.line(frame,(x1,y1),(x2,y2),(0,0,255),2, cv2.LINE_AA)
-    return frame
-    
+side = min(warp.shape[0],warp.shape[1])
+side = side / 9
+squares = []
+frame = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
+for i in range(9):
+    for j in range(9):
+        tl = (i*side, j*side)
+        br = ((i+1)*side, (j+1)*side)
+        squares.append((tl,br))
+for square in squares:
+    frame = cv2.rectangle(frame, tuple(int(x) for x in square[0]), tuple(int(x) for x in square[1]), (0,0,255))
 
-lines = houghtransf(warp)
-cv2.imshow('lines', lines)
+cv2.imshow('grid', frame)
 cv2.waitKey(0)
-        
+
+
