@@ -125,12 +125,11 @@ my_callback=[EarlyStop_callback]
 
 digitModel.fit(x = train_X, y = train_Y, epochs = 34, batch_size = 16, validation_split = 0.1, callbacks = my_callback)
 
-
-digitModel.save(r'final_model.h5')
-
 _, acc = digitModel.evaluate(test_X, test_Y, verbose=0)
 
 print('Test Accuracy: ', acc)
+
+digitModel.save(r'model.h5')
 
 
 

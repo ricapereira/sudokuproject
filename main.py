@@ -12,14 +12,23 @@ from IPython.display import SVG
 from keras.utils.vis_utils import model_to_dot
 from keras.utils import plot_model
 from keras.callbacks import EarlyStopping
-import h5py
+import h5py as h5
 import preprocessing
 import backtracking
 
-digitModel = load_model(r'final_model.h5', compile=False)
+digitModel = load_model(r'model.h5', compile=False)
 
-img_path = r'images\\test1.jpg'
+img_path = r'images\\1.jpg'
 digits = preprocessing.img_to_digits(img_path)
-cv2.imshow('digit1',digits[1])
-cv2.waitKey(0)
-#digit = digitModel.predict_classes()
+'''
+for d in range(81):
+    cv2.imshow('num'+str(d), digits[d])
+    cv2.waitKey(0)
+'''
+digit = digitModel.predict(digits)
+
+
+sudoku = digit.argmax(axis=-1)
+sudoku = sudoku.reshape(9,9)
+sudoku = np.transpose(sudoku)
+print(sudoku)
