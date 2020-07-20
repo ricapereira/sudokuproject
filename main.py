@@ -1,4 +1,3 @@
-import numpy as np
 import os
 import keras as k
 import tensorflow as tf
@@ -15,6 +14,7 @@ from keras.callbacks import EarlyStopping
 import h5py as h5
 import preprocessing
 import backtracking
+import numpy as np
 
 digitModel = load_model(r'model.h5', compile=False)
 
