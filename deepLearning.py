@@ -13,7 +13,7 @@ from keras.utils.vis_utils import model_to_dot
 from keras.utils import plot_model
 from keras.callbacks import EarlyStopping
 import h5py
-
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 def remove_digit0(train_X,train_Y):
     id = []
     for i in range (train_X.shape[0]):

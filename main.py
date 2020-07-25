@@ -1,6 +1,5 @@
 import os
 import keras as k
-import tensorflow as tf
 import cv2
 import random
 from keras import layers
@@ -15,6 +14,7 @@ import h5py as h5
 import preprocessing
 import backtracking
 import numpy as np
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 digitModel = load_model(r'model.h5', compile=False)
 
