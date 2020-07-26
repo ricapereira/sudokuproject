@@ -18,13 +18,13 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 digitModel = load_model(r'model.h5', compile=False)
 
-img_path = r'images\\1.jpg'
+img_path = r'images\\test2.jpg'
 digits = preprocessing.img_to_digits(img_path)
-'''
+
 for d in range(81):
     cv2.imshow('num'+str(d), digits[d])
     cv2.waitKey(0)
-'''
+
 digit = digitModel.predict(digits)
 
 

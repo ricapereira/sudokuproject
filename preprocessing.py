@@ -108,12 +108,15 @@ def extract_digits(frame, squares, warp):
         cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
         try:
             x,y,w,h = cv2.boundingRect(cnts[0])
-            if (x,y,w,h) == (0,0,28,28) or ((x,w) == (0,28) and (h-y)<13) or ((y,h) == (0,28) and (w-x)<10):
+            if np.all((num[i][11:16,11:16] == 0)) == True:
                 num[i] = np.zeros((28,28,1))
             else:
-                num[i] = num[i][y:h+8, x:w+8]
-                num[i] = center_pad(num[i])
-                num[i] = num[i].reshape(28,28,1)
+                if (x,y,w,h) == (0,0,28,28) or ((x,w) == (0,28) and (h-y)<13) or ((y,h) == (0,28) and (w-x)<10):
+                    num[i] = np.zeros((28,28,1))
+                else:
+                    num[i] = num[i][y:h+8, x:w+8]
+                    num[i] = center_pad(num[i])
+                    num[i] = num[i].reshape(28,28,1)
             
         except IndexError:
             num[i] = np.zeros((28,28,1))

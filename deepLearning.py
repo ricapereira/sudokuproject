@@ -63,16 +63,30 @@ def get_data(train_X, train_Y, test_X, test_Y):
     tslabel = np.array(tslabel, dtype = np.uint8)
     tsset = tsset.reshape(3097, -1)
 
+    trsetextra = np.zeros((5423,28,28,1))
+    trlabelextra = np.zeros((5423,))
+    tssetextra = np.zeros((680,28,28,1))
+    tslabelextra = np.zeros((680,))
+
     train_X = np.concatenate((train_X, trset), axis=0)
     train_X = train_X.reshape(-1,28,28,1)
+    train_X = np.concatenate((train_X, trsetextra), axis=0)
     train_X = train_X / 255
+
     train_Y = np.concatenate((train_Y, trlabel), axis=0)
+    train_Y = np.concatenate((train_Y, trlabelextra), axis=0)
     train_Y = tf.keras.utils.to_categorical(train_Y, 10)
+
     test_X = np.concatenate((test_X, tsset), axis=0)
     test_X = test_X.reshape(-1,28,28,1)
+    test_X = np.concatenate((test_X, tssetextra), axis=0)
     test_X = test_X / 255
+
     test_Y = np.concatenate((test_Y, tslabel), axis=0)
+    test_Y = np.concatenate((test_Y, tslabelextra), axis=0)
     test_Y = tf.keras.utils.to_categorical(test_Y, 10)
+
+    
 
     return train_X, train_Y, test_X, test_Y
 
@@ -111,10 +125,13 @@ def DigitModel(input_shape):
 (train_X, train_Y), (test_X, test_Y) = tf.keras.datasets.mnist.load_data(path="mnist.npz")
 train_X = train_X.reshape(60000,-1)
 test_X = test_X.reshape(10000,-1)
+train_X, train_Y = remove_digit0(train_X, train_Y)
+test_X, test_Y = remove_digit0(test_X, test_Y)
 
 train_X, train_Y, test_X, test_Y = get_data(train_X, train_Y, test_X, test_Y)
 
 train_X, train_Y = shuffle_data(train_X, train_Y)
+test_X, test_Y = shuffle_data(test_X, test_Y)
 
 digitModel = DigitModel(train_X.shape[1:])
 
