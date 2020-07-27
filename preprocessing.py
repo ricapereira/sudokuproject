@@ -10,9 +10,6 @@ def preprocess_img(img):
     dsst = cv2.GaussianBlur(gray,(9,9),0)
     #Transform to inverse binary image
     img = cv2.adaptiveThreshold(dsst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 5)
-    #Dilate the boundaries
-    #kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
-    #img = cv2.dilate(img,kernel,iterations = 1)
 
     return img
 

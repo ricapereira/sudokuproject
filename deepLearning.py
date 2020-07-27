@@ -154,5 +154,4 @@ digitModel.save(r'model.h5')
 
 
 
-
       
