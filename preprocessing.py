@@ -11,8 +11,8 @@ def preprocess_img(img):
     #Transform to inverse binary image
     img = cv2.adaptiveThreshold(dsst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 5)
     #Dilate the boundaries
-    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
-    img = cv2.dilate(img,kernel,iterations = 1)
+    #kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
+    #img = cv2.dilate(img,kernel,iterations = 1)
 
     return img
 
@@ -134,12 +134,25 @@ def img_to_digits(path):
     corners = find_corners(img)
     warp = cut_and_warp(img, corners)
     warp = cv2.GaussianBlur(warp,(3,3),3)
+    warp = houghtransf(warp)
+    cv2.imshow('grid', warp)
+    cv2.waitKey(0)
+    warp = cv2.cvtColor(warp, cv2.COLOR_RGB2GRAY)
     squares, frame = make_grid(warp)
     digits = extract_digits(frame, squares, warp)
 
     return digits
 
-    
+def houghtransf(binary_image):
+    edges = cv2.Canny(binary_image, 50, 200)
+    lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=100, minLineLength=10, maxLineGap=250)
+    frame = cv2.cvtColor(binary_image, cv2.COLOR_GRAY2RGB)
+    for l in lines:
+        x1,y1,x2,y2 = l[0]
+        cv2.line(frame,(x1,y1),(x2,y2),(0,0,0),10, cv2.LINE_AA)
+    kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
+    frame = cv2.dilate(frame,kernel,iterations = 2)
+    return frame    
 
 
 
