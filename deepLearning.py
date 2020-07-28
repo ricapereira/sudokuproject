@@ -14,79 +14,67 @@ from keras.utils import plot_model
 from keras.callbacks import EarlyStopping
 import h5py
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
-def remove_digit0(train_X,train_Y):
-    id = []
-    for i in range (train_X.shape[0]):
-        if train_Y[i] == 0:
-            id.append(i)
-    train_Y = np.delete(train_Y, id, 0)
-    train_X = np.delete(train_X, id, 0)
-    return train_X, train_Y
 
-def get_data(train_X, train_Y, test_X, test_Y):
-    train_X, train_Y = remove_digit0(train_X, train_Y)
-    test_X, test_Y = remove_digit0(test_X, test_Y)
-
-    train_path = r'Train'  
-    list_folder = os.listdir(train_path)
+def getdata():
+    bigtrainpath = r'Train\big'
+    smalltrainpath = r'Train\small'
+    testpath = r'Test'
+    paths = (bigtrainpath, smalltrainpath, testpath)
     trset = []
-    for folder in list_folder:
-        fimages = os.listdir(os.path.join(train_path, folder))
-        for f in fimages:
-            img = cv2.imread(os.path.join(train_path, folder, f))
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-            img = cv2.resize(img, (28,28))
-            trset.append(img)
-    trset = np.array(trset, dtype = np.uint8)
-    trset = trset.reshape(5000, -1)
-
-    train_label = []
-    for i in range(0,10):
-        temp = 500*[i]
-        train_label += temp
-    trlabel = np.array(train_label, dtype = np.uint8)
-
-
-    test_path = r'Test'  
-    list_folder = os.listdir(test_path)
+    trlabel = []
     tsset = []
     tslabel = []
-    for folder in list_folder:
-        fimages = os.listdir(os.path.join(test_path, folder))
-        for f in fimages:
-            img = cv2.imread(os.path.join(test_path, folder, f))
-            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-            img = cv2.resize(img, (28,28))
-            tsset.append(img)
-            tslabel.append(int(folder))
-    tsset = np.array(tsset, dtype = np.uint8)
-    tslabel = np.array(tslabel, dtype = np.uint8)
-    tsset = tsset.reshape(3097, -1)
-
-    trsetextra = np.zeros((5423,28,28,1))
-    trlabelextra = np.zeros((5423,))
-    tssetextra = np.zeros((680,28,28,1))
-    tslabelextra = np.zeros((680,))
-
-    train_X = np.concatenate((train_X, trset), axis=0)
-    train_X = train_X.reshape(-1,28,28,1)
-    train_X = np.concatenate((train_X, trsetextra), axis=0)
-    train_X = train_X / 255
-
-    train_Y = np.concatenate((train_Y, trlabel), axis=0)
-    train_Y = np.concatenate((train_Y, trlabelextra), axis=0)
+    for path in paths:
+        a = 0
+        list_folder = os.listdir(path)
+        for folder in list_folder:
+            a = a+1
+            fimages = os.listdir(path)
+            img = cv2.imread(os.path.join(path, folder))
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            if (path == bigtrainpath):
+                for i in range(1,501):
+                    for j in range(1,51):
+                        data = img[(i-1)*28:i*28, (j-1)*28:j*28]
+                        data.reshape(28,28,1)
+                        trset.append(data)
+                        trlabel.append(a)
+            elif (path == smalltrainpath):
+                for k in range(1,101):
+                    for l in range(1,51):
+                        data = img[(k-1)*28:k*28, (l-1)*28:l*28]
+                        data.reshape(28,28,1)
+                        trset.append(data)
+                        trlabel.append(a)
+            elif (path == testpath):
+                for m in range(1,51):
+                    for n in range(1,51):
+                        data = img[(m-1)*28:m*28, (n-1)*28:n*28]
+                        data.reshape(28,28,1)
+                        tsset.append(data)
+                        tslabel.append(a)
+    
+    trset = np.array(trset, dtype = np.uint8)
+    trlabel = np.array(trlabel, dtype = np.uint8)
+    trsetextra = np.zeros((30000,28,28))
+    trlabelextra = np.zeros((30000,))
+    train_X = np.concatenate((trset, trsetextra), axis=0)
+    train_Y = np.concatenate((trlabel, trlabelextra), axis=0)
+    print(train_X.shape)
+    train_X = train_X[:,:,:,np.newaxis]
+    print(train_X.shape)
     train_Y = tf.keras.utils.to_categorical(train_Y, 10)
 
-    test_X = np.concatenate((test_X, tsset), axis=0)
-    test_X = test_X.reshape(-1,28,28,1)
-    test_X = np.concatenate((test_X, tssetextra), axis=0)
-    test_X = test_X / 255
-
-    test_Y = np.concatenate((test_Y, tslabel), axis=0)
-    test_Y = np.concatenate((test_Y, tslabelextra), axis=0)
+    tsset = np.array(tsset, dtype = np.uint8)
+    tslabel = np.array(tslabel, dtype = np.uint8)
+    tssetextra = np.zeros((2500,28,28))
+    tslabelextra = np.zeros((2500,))
+    test_X = np.concatenate((tsset, tssetextra), axis=0)
+    test_Y = np.concatenate((tslabel, tslabelextra), axis=0)
+    print(test_X.shape)
+    test_X = test_X[:,:,:,np.newaxis]
+    print(test_X.shape)
     test_Y = tf.keras.utils.to_categorical(test_Y, 10)
-
-    
 
     return train_X, train_Y, test_X, test_Y
 
@@ -122,13 +110,7 @@ def DigitModel(input_shape):
     return model
 
 
-(train_X, train_Y), (test_X, test_Y) = tf.keras.datasets.mnist.load_data(path="mnist.npz")
-train_X = train_X.reshape(60000,-1)
-test_X = test_X.reshape(10000,-1)
-train_X, train_Y = remove_digit0(train_X, train_Y)
-test_X, test_Y = remove_digit0(test_X, test_Y)
-
-train_X, train_Y, test_X, test_Y = get_data(train_X, train_Y, test_X, test_Y)
+train_X, train_Y, test_X, test_Y = getdata()
 
 train_X, train_Y = shuffle_data(train_X, train_Y)
 test_X, test_Y = shuffle_data(test_X, test_Y)
@@ -146,12 +128,5 @@ _, acc = digitModel.evaluate(test_X, test_Y, verbose=0)
 
 print('Test Accuracy: ', acc)
 
-digitModel.save(r'model.h5')
+digitModel.save(r'newmodel.h5')
 
-
-
-
-
-
-
-      

@@ -16,10 +16,11 @@ import backtracking
 import numpy as np
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
-#model.h5 -> largest dataset (64000)
-digitModel = load_model(r'model.h5', compile=False)
+#model.h5 -> old dataset (64.000)
+#newmodel.h5 -> new dataset (300.000)
+digitModel = load_model(r'newmodel.h5', compile=False)
 
-img_path = r'images\\test2.jpg'
+img_path = r'images\\test11.jpg'
 digits = preprocessing.img_to_digits(img_path)
 '''
 for d in range(81):
