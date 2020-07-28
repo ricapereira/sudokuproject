@@ -148,7 +148,11 @@ def houghtransf(binary_image):
         x1,y1,x2,y2 = l[0]
         cv2.line(frame,(x1,y1),(x2,y2),(0,0,0),10, cv2.LINE_AA)
     kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(2,2))
-    frame = cv2.dilate(frame,kernel,iterations = 2)
+    frame = cv2.morphologyEx(frame, cv2.MORPH_ERODE, kernel, iterations=1)
+    frame = cv2.dilate(frame,kernel,iterations = 1)
+    frame = cv2.GaussianBlur(frame,(5,5),0)
+    cv2.imshow('final', frame)
+    cv2.waitKey(0)
     return frame    
 
 
