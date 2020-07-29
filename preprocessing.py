@@ -53,7 +53,7 @@ def cut_and_warp(img, corners):
 
     warp = cv2.warpPerspective(img, matrix, (int(width), int(height)))
 
-    return warp
+    return warp, corners, dst
 
 def make_grid(warp):
     side = min(warp.shape[0],warp.shape[1])
@@ -125,20 +125,18 @@ def img_to_digits(path):
     img0 = cv2.imread(path)
     if (img0.shape[0]<600) or (img0.shape[1]<600):
         img0 = cv2.resize(img0,(600,600))
-    cv2.imshow('original', img0)
-    cv2.waitKey(0)
     img = preprocess_img(img0)
     corners = find_corners(img)
-    warp = cut_and_warp(img, corners)
-    warp = cv2.GaussianBlur(warp,(3,3),3)
-    warp = houghtransf(warp)
+    warp, corners, dst = cut_and_warp(img, corners)
+    pic = cv2.GaussianBlur(warp,(3,3),3)
+    pic = houghtransf(pic)
     #cv2.imshow('grid', warp)
     #cv2.waitKey(0)
-    warp = cv2.cvtColor(warp, cv2.COLOR_RGB2GRAY)
-    squares, frame = make_grid(warp)
-    digits = extract_digits(frame, squares, warp)
+    pic = cv2.cvtColor(pic, cv2.COLOR_RGB2GRAY)
+    squares, frame = make_grid(pic)
+    digits = extract_digits(frame, squares, pic)
 
-    return digits
+    return digits, pic, img0, corners, dst
 
 def houghtransf(binary_image):
     edges = cv2.Canny(binary_image, 50, 200)
@@ -151,11 +149,17 @@ def houghtransf(binary_image):
     frame = cv2.morphologyEx(frame, cv2.MORPH_ERODE, kernel, iterations=1)
     frame = cv2.dilate(frame,kernel,iterations = 1)
     frame = cv2.GaussianBlur(frame,(5,5),0)
-    cv2.imshow('final', frame)
-    cv2.waitKey(0)
+    #cv2.imshow('final', frame)
+    #cv2.waitKey(0)
     return frame    
 
-
+def print_final(dst,corners,warp,img0):
+    M = cv2.getPerspectiveTransform(dst,corners)
+    
+    img = cv2.warpPerspective(warp,M,(img0.shape[1],img0.shape[0]))
+    img = cv2.bitwise_not(img)
+    img = cv2.bitwise_and(img,img0)
+    return img
 
 
 
