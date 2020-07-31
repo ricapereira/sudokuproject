@@ -5,12 +5,12 @@ import operator
 
 def preprocess_img(img):
     #grayscale
+    #gray = cv2.resize(img, (1000,1000))
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #Gaussian Blur Filter
     dsst = cv2.GaussianBlur(gray,(9,9),0)
     #Transform to inverse binary image
     img = cv2.adaptiveThreshold(dsst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 5)
-
     return img
 
 def find_corners(img):
@@ -111,7 +111,7 @@ def extract_digits(frame, squares, warp):
                 if (x,y,w,h) == (0,0,28,28) or ((x,w) == (0,28) and (h-y)<13) or ((y,h) == (0,28) and (w-x)<10):
                     num[i] = np.zeros((28,28,1))
                 else:
-                    num[i] = num[i][y:h+8, x:w+8]
+                    num[i] = num[i][y:h+8, x:w+8]#8[y:h+6, x:w+6]
                     num[i] = center_pad(num[i])
                     num[i] = num[i].reshape(28,28,1)
             
@@ -125,13 +125,13 @@ def img_to_digits(path):
     img0 = cv2.imread(path)
     if (img0.shape[0]<600) or (img0.shape[1]<600):
         img0 = cv2.resize(img0,(600,600))
+    if (img0.shape[0]>1100) or (img0.shape[1]>1100):
+        img0 = cv2.resize(img0,(850,850))
     img = preprocess_img(img0)
     corners = find_corners(img)
     warp, corners, dst = cut_and_warp(img, corners)
     pic = cv2.GaussianBlur(warp,(3,3),3)
     pic = houghtransf(pic)
-    #cv2.imshow('grid', warp)
-    #cv2.waitKey(0)
     pic = cv2.cvtColor(pic, cv2.COLOR_RGB2GRAY)
     squares, frame = make_grid(pic)
     digits = extract_digits(frame, squares, pic)

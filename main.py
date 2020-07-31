@@ -17,10 +17,15 @@ def goto(linenum):
 #newmodel.h5 -> new dataset (300.000)
 digitModel = load_model(r'newmodel.h5', compile=False)
 
-img_path = r'images\\test2.jpg'
+img_path = r'images\\testefinal2.jpeg'
 digits, warp, img0, corners, dst = preprocessing.img_to_digits(img_path)
+'''
+for i in range(81):
+        cv2.imshow('num'+str(i), digits[i])
+        cv2.waitKey(0)
+'''
 warp = cv2.cvtColor(warp, cv2.COLOR_GRAY2RGB)
-cv2.imshow('original', img0)
+cv2.imshow('original', warp)
 cv2.waitKey(0)
 
 digit = digitModel.predict(digits)
