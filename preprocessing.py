@@ -10,6 +10,7 @@ def preprocess_img(img):
     #Gaussian Blur Filter
     dsst = cv2.GaussianBlur(gray,(9,9),0)
     #Transform to inverse binary image
+    #jdaidbsiajbdisa
     img = cv2.adaptiveThreshold(dsst, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 11, 5)
     return img
 
